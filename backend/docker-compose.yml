@@ -1,9 +1,29 @@
-
-version: '3.8'
+version: "3.8"
 services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: psp
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
   api:
     build: .
-    container_name: psp_api
     ports:
-      - "3000:3000"
-    restart: always
+      - "4000:4000"
+    environment:
+      DATABASE_TYPE: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: password
+      DATABASE_NAME: psp
+    depends_on:
+      - db
+
+volumes:
+  db_data:

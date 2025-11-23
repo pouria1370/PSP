@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 @Injectable()
 export class AuthService {
   login() {
-    return "login ok";
+    // replace with real auth later
+    return { ok: true, token: "demo-token" };
   }
 }
