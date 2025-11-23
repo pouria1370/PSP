@@ -2,6 +2,6 @@ import { Injectable } from "@nestjs/common";
 @Injectable()
 export class AuthService {
   login() {
-    return "login ok";
+    return { ok: true, token: "demo" };
   }
 }

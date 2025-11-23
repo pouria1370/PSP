@@ -1,16 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
 export class Merchant {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
   @Column()
   name!: string;
 
-  @Column()
+  @Column({ unique: true })
   apiKey!: string;
 
-  @Column()
+  @Column({ default: true })
   isActive!: boolean;
 }
