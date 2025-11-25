@@ -4,13 +4,19 @@ import { Transaction, TransactionStatus } from "./transaction.entity";
 import { Repository } from "typeorm";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
 import { Merchant } from "../merchant/merchant.entity";
+import { WebhookQueue } from "src/webhook/webhook.queue";
 
 @Injectable()
 export class TransactionService {
+  private webhookQueue: WebhookQueue;
+
   constructor(
     @InjectRepository(Transaction)
     private repo: Repository<Transaction>
-  ) {}
+  ) {
+    // For MVP simple approach: create queue instance here
+    this.webhookQueue = new WebhookQueue();
+  }
 
   async create(dto: CreateTransactionDto) {
     const merchantRepo = this.repo.manager.getRepository(Merchant);
@@ -25,7 +31,17 @@ export class TransactionService {
       customerPhone: dto.customerPhone,
       status: TransactionStatus.PENDING,
     });
-    return this.repo.save(tx);
+    const saved = await this.repo.save(tx);
+
+    // enqueue webhook job for async delivery
+    await this.webhookQueue.enqueue("transaction.created", {
+      transactionId: saved.id,
+      merchantId: merchant.id,
+      // optionally include merchant webhook url if known:
+      // url: merchant.webhookUrl
+    });
+
+    return saved;
   }
 
   async list(merchantId: string, limit = 20, offset = 0) {

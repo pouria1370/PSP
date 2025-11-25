@@ -4,10 +4,12 @@ import { TransactionController } from "./transaction.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Transaction } from "./transaction.entity";
 import { Merchant } from "../merchant/merchant.entity";
+import { WebhookQueue } from "src/webhook/webhook.queue";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Transaction, Merchant])],
   controllers: [TransactionController],
-  providers: [TransactionService],
+  providers: [TransactionService, WebhookQueue],
+  exports: [TransactionService],
 })
 export class TransactionModule {}

@@ -1,5 +1,10 @@
 version: "3.8"
 services:
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
   db:
     image: postgres:15
     environment:
@@ -22,8 +27,20 @@ services:
       DATABASE_USERNAME: postgres
       DATABASE_PASSWORD: password
       DATABASE_NAME: psp
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on:
       - db
+      - redis
+
+  worker:
+    build: .
+    command: npm run worker
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - redis
 
 volumes:
   db_data:

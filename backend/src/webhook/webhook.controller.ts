@@ -9,4 +9,9 @@ export class WebhookController {
   send(@Body() body: any) {
     return this.s.send(body.payload, body.url);
   }
+  @Post("receive")
+  receive(@Body() body: any) {
+    console.log("received webhook:", body);
+    return { ok: true, received: body };
+  }
 }
