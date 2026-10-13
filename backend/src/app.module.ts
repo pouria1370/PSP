@@ -1,54 +1,35 @@
-// import { Module } from "@nestjs/common";
-// import { AuthModule } from "./auth/auth.module";
-// import { MerchantModule } from "./merchant/merchant.module";
-// import { PaymentModule } from "./payment/payment.module";
-// import { TransactionModule } from "./transaction/transaction.module";
-// import { WebhookModule } from "./webhook/webhook.module";
-// import { TypeOrmModule } from "@nestjs/typeorm";
-// import { ConfigModule } from "@nestjs/config";
-// @Module({
-//   imports: [
-//     ConfigModule.forRoot({ isGlobal: true }),
-
-//     TypeOrmModule.forRootAsync({
-//       useFactory: () => ({
-//         type: "postgres",
-//         host: process.env.DATABASE_HOST,
-//         port: Number(process.env.DATABASE_PORT),
-//         username: process.env.DATABASE_USER,
-//         password: process.env.DATABASE_PASS,
-//         database: process.env.DATABASE_NAME,
-//         autoLoadEntities: true,
-//         synchronize: true, // بعداً false
-//       }),
-//     }),
-//     AuthModule,
-//     MerchantModule,
-//     PaymentModule,
-//     TransactionModule,
-//     WebhookModule,
-//   ],
-// })
-// export class AppModule {}
-
 import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
+
 import { AuthModule } from "./auth/auth.module";
 import { MerchantModule } from "./merchant/merchant.module";
 import { PaymentModule } from "./payment/payment.module";
 import { TransactionModule } from "./transaction/transaction.module";
 import { WebhookModule } from "./webhook/webhook.module";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { ConfigModule } from "@nestjs/config";
-
+import { AppController } from "./app.controller";
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
 
-    TypeOrmModule.forRoot({
-      type: "sqlite",
-      database: "data.sqlite", // فایل دیتابیس محلی
-      autoLoadEntities: true,
-      synchronize: true, // فقط برای توسعه
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: "postgres" as const,
+        host: configService.get<string>("DATABASE_HOST"),
+        port: Number(configService.get<string>("DATABASE_PORT", "5433")),
+        username: configService.get<string>("DATABASE_USER"),
+        password: configService.get<string>("DATABASE_PASS"),
+        database: configService.get<string>("DATABASE_NAME"),
+
+        autoLoadEntities: true,
+
+        // فعلاً برای این مرحله غیرفعال می‌ماند.
+        synchronize: false,
+      }),
     }),
 
     AuthModule,
@@ -57,5 +38,6 @@ import { ConfigModule } from "@nestjs/config";
     TransactionModule,
     WebhookModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

@@ -1,9 +1,21 @@
-
-version: '3.8'
 services:
-  api:
-    build: .
-    container_name: psp_api
+  postgres:
+    image: docker.arvancloud.ir/postgres:16
+    container_name: psp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: psp
+      POSTGRES_USER: psp_user
+      POSTGRES_PASSWORD: local_dev_password
     ports:
-      - "3000:3000"
-    restart: always
+      - "5433:5432"
+    volumes:
+      - psp_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U psp_user -d psp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  psp_postgres_data:

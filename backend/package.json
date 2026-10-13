@@ -1,27 +1,31 @@
 {
   "dependencies": {
-    "@nestjs/common": "^11.1.9",
+    "@nestjs/common": "^11.1.14",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.9",
     "@nestjs/platform-express": "^11.1.9",
     "@nestjs/typeorm": "^11.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "dotenv": "^18.0.7",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
-    "sqlite3": "^5.1.7",
     "typeorm": "^0.3.27"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.11",
     "@types/node": "^24.10.1",
     "ts-node": "^10.9.2",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   },
   "scripts": {
     "start": "nest start",
     "start:dev": "nest start --watch",
     "build": "tsc -p tsconfig.json",
-    "start:prod": "node dist/main.js"
+    "start:prod": "node dist/main.js",
+    "migration:show": "tsx ./node_modules/typeorm/cli.js migration:show -d src/data-source.ts",
+    "migration:run": "tsx ./node_modules/typeorm/cli.js migration:run -d src/data-source.ts",
+    "migration:revert": "tsx ./node_modules/typeorm/cli.js migration:revert -d src/data-source.ts"
   }
 }

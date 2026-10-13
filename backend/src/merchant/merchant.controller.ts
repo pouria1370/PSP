@@ -1,12 +1,14 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
-import { MerchantService } from "./merchant.service";
+import { Body, Controller, Post } from "@nestjs/common";
+
+import { MerchantService } from "./merchant.service.js";
+import { CreateMerchantDto } from "./create-merchant.dto.js";
 
 @Controller("merchant")
 export class MerchantController {
-  constructor(private s: MerchantService) {}
+  constructor(private readonly service: MerchantService) {}
 
   @Post("create")
-  create(@Body() body) {
-    return this.s.create(body);
+  create(@Body() body: CreateMerchantDto) {
+    return this.service.create(body);
   }
 }

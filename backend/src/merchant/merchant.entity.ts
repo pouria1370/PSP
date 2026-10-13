@@ -1,16 +1,20 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Payment } from "../payment/payment.entity";
 
-@Entity()
+@Entity("merchants")
 export class Merchant {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: "varchar" })
   name!: string;
 
-  @Column()
+  @Column({ type: "varchar", unique: true })
   apiKey!: string;
 
-  @Column()
+  @Column({ type: "boolean", default: true })
   isActive!: boolean;
+
+  @OneToMany(() => Payment, (payment) => payment.merchant)
+  payments!: Payment[];
 }
