@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, ConflictException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { createHash } from "node:crypto";
@@ -21,14 +21,35 @@ export class PaymentService {
     return createHash("sha256").update(payload).digest("hex");
   }
   async create(data: CreatePaymentDto, idempotencyKey: string) {
+    const merchantId = 1;
+
+    const requestHash = this.generateRequestHash(data);
+
+    const existingPayment = await this.paymentRepository.findOne({
+      where: {
+        merchantId,
+        idempotencyKey,
+      },
+    });
+
+    if (existingPayment) {
+      if (existingPayment.requestHash !== requestHash) {
+        throw new ConflictException(
+          "Idempotency-Key was already used with a different request",
+        );
+      }
+
+      return existingPayment;
+    }
+
     const payment = this.paymentRepository.create({
       orderId: data.orderId,
       amount: String(data.amount),
       currency: data.currency,
       status: "PENDING",
-      merchantId: 1,
+      merchantId,
       idempotencyKey,
-      requestHash: this.generateRequestHash(data),
+      requestHash,
     });
 
     return this.paymentRepository.save(payment);
