@@ -21,8 +21,11 @@ export class PaymentService {
     return createHash("sha256").update(payload).digest("hex");
   }
 
-  async create(data: CreatePaymentDto, idempotencyKey: string) {
-    const merchantId = 1; // موقت؛ بعداً از احراز هویت استخراج می‌شود
+  async create(
+    data: CreatePaymentDto,
+    idempotencyKey: string,
+    merchantId: number,
+  ) {
     const requestHash = this.generateRequestHash(data);
 
     const existingPayment = await this.paymentRepository.findOne({

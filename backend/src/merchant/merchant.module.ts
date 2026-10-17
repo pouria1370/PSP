@@ -7,5 +7,6 @@ import { Merchant } from "./merchant.entity.js";
   imports: [TypeOrmModule.forFeature([Merchant])],
   controllers: [MerchantController],
   providers: [MerchantService],
+  exports: [MerchantService],
 })
 export class MerchantModule {}

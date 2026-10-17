@@ -20,4 +20,12 @@ export class MerchantService {
 
     return this.repo.save(merchant);
   }
+  async findActiveByApiKey(apiKey: string): Promise<Merchant | null> {
+    return this.repo.findOne({
+      where: {
+        apiKey,
+        isActive: true,
+      },
+    });
+  }
 }
