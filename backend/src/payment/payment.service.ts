@@ -1,10 +1,16 @@
-import { Injectable, ConflictException } from "@nestjs/common";
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from "@nestjs/common";
+import { PaymentStatus } from "./payment-status.enum";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { createHash } from "node:crypto";
 import { Payment } from "./payment.entity";
 import { CreatePaymentDto } from "./create-payment.dto";
 import { QueryFailedError } from "typeorm";
+import { assertCanTransition } from "./payment-state-machine";
 @Injectable()
 export class PaymentService {
   constructor(
@@ -20,7 +26,46 @@ export class PaymentService {
 
     return createHash("sha256").update(payload).digest("hex");
   }
+  async transitionStatus(
+    paymentId: string,
+    nextStatus: PaymentStatus,
+  ): Promise<Payment> {
+    const payment = await this.paymentRepository.findOne({
+      where: { id: paymentId },
+    });
 
+    if (!payment) {
+      throw new NotFoundException("Payment not found");
+    }
+
+    try {
+      assertCanTransition(payment.status, nextStatus);
+    } catch {
+      throw new ConflictException(
+        `Cannot transition payment from ${payment.status} to ${nextStatus}`,
+      );
+    }
+    const result = await this.paymentRepository
+      .createQueryBuilder()
+      .update(Payment)
+      .set({ status: nextStatus })
+      .where("id = :id", { id: paymentId })
+      .andWhere("status = :currentStatus", {
+        currentStatus: payment.status,
+      })
+      .execute();
+
+    if (result.affected !== 1) {
+      throw new ConflictException(
+        "Payment status changed concurrently; retry or reload",
+      );
+    }
+
+    return {
+      ...payment,
+      status: nextStatus,
+    };
+  }
   async create(
     data: CreatePaymentDto,
     idempotencyKey: string,
@@ -46,7 +91,7 @@ export class PaymentService {
       orderId: data.orderId,
       amount: String(data.amount),
       currency: data.currency,
-      status: "PENDING",
+      status: PaymentStatus.PENDING,
       merchantId,
       idempotencyKey,
       requestHash,

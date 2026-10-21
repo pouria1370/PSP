@@ -1,4 +1,3 @@
-import { Merchant } from "src/merchant/merchant.entity";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -10,7 +9,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from "typeorm";
-
+import { PaymentStatus } from "./payment-status.enum";
+import { Merchant } from "../merchant/merchant.entity";
 @Entity("payments")
 @Index(
   "UQ_payments_merchant_idempotency_key",
@@ -18,6 +18,18 @@ import {
   { unique: true },
 )
 @Check("CHK_payments_amount_positive", '"amount" > 0')
+@Check(
+  "CHK_payments_status_valid",
+  `"status" IN (
+    'PENDING',
+    'AUTHORIZING',
+    'AUTHORIZED',
+    'SETTLED',
+    'FAILED',
+    'UNKNOWN',
+    'CANCELLED'
+  )`,
+)
 export class Payment {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
@@ -45,8 +57,12 @@ export class Payment {
   @Column({ type: "varchar", length: 3 })
   currency!: string;
 
-  @Column({ type: "varchar", length: 20, default: "PENDING" })
-  status!: string;
+  @Column({
+    type: "varchar",
+    length: 20,
+    default: PaymentStatus.PENDING,
+  })
+  status!: PaymentStatus;
 
   @Column({ type: "varchar", length: 128 })
   idempotencyKey!: string;
