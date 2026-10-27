@@ -131,4 +131,15 @@ export class PaymentService {
       throw error;
     }
   }
+  async getPayment(paymentId: string): Promise<Payment> {
+    const payment = await this.paymentRepository.findOne({
+      where: { id: paymentId },
+    });
+
+    if (!payment) {
+      throw new NotFoundException("Payment not found");
+    }
+
+    return payment;
+  }
 }

@@ -7,9 +7,23 @@ import { PaymentController } from "./payment.controller";
 import { AuthModule } from "../auth/auth.module";
 import { MerchantModule } from "../merchant/merchant.module";
 import { ApiKeyGuard } from "../auth/api-key.guard";
+import { PaymentInquiry } from "./payment-inquiry.entity";
+import { PaymentInquiryService } from "./payment-inquiry.service";
+import { PaymentInquiryDecisionService } from "./payment-inquiry-decision.service";
+import { PaymentInquiryWorkflowService } from "./payment-inquiry-workflow.service";
 @Module({
-  imports: [TypeOrmModule.forFeature([Payment]), AuthModule, MerchantModule],
+  imports: [
+    TypeOrmModule.forFeature([Payment, PaymentInquiry]),
+    AuthModule,
+    MerchantModule,
+  ],
   controllers: [PaymentController],
-  providers: [PaymentService, ApiKeyGuard],
+  providers: [
+    PaymentService,
+    ApiKeyGuard,
+    PaymentInquiryService,
+    PaymentInquiryDecisionService,
+    PaymentInquiryWorkflowService,
+  ],
 })
 export class PaymentModule {}

@@ -29,6 +29,11 @@
     "migration:run": "tsx ./node_modules/typeorm/cli.js migration:run -d src/data-source.ts",
     "migration:revert": "tsx ./node_modules/typeorm/cli.js migration:revert -d src/data-source.ts",
     "test:state-machine": "npm run build && node --test test/payment-state-machine.test.cjs",
-    "test:payment-concurrency": "npm run build && node --test test/payment-concurrency.test.cjs"
+    "test:payment-concurrency": "npm run build && node --test test/payment-concurrency.test.cjs",
+    "test:inquiry-concurrency": "npm run build && node --test test/payment-inquiry-concurrency.test.cjs",
+    "test:inquiry-lifecycle": "npm run build && node --test test/payment-inquiry-lifecycle.test.cjs",
+    "test:inquiry-decision": "npm run build && node --test test/payment-inquiry-decision.test.cjs",
+    "test:inquiry-workflow": "npm run build && node --test test/payment-inquiry-workflow.test.cjs",
+    "test:inquiry-workflow-integration": "npm run build && node --test test/payment-inquiry-workflow.integration.test.cjs"
   }
 }
