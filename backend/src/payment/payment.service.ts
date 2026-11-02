@@ -11,6 +11,7 @@ import { Payment } from "./payment.entity";
 import { CreatePaymentDto } from "./create-payment.dto";
 import { QueryFailedError } from "typeorm";
 import { assertCanTransition } from "./payment-state-machine";
+import { randomUUID } from "node:crypto";
 @Injectable()
 export class PaymentService {
   constructor(
@@ -95,8 +96,9 @@ export class PaymentService {
       merchantId,
       idempotencyKey,
       requestHash,
+      providerRequestReference: randomUUID(),
+      providerReference: null,
     });
-
     try {
       return await this.paymentRepository.save(payment);
     } catch (error) {

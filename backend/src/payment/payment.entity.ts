@@ -70,6 +70,20 @@ export class Payment {
   @Column({ type: "varchar", length: 64 })
   requestHash!: string;
 
+  @Column({
+    type: "varchar",
+    length: 128,
+    nullable: true,
+  })
+  providerRequestReference!: string | null;
+
+  @Column({
+    type: "varchar",
+    length: 128,
+    nullable: true,
+  })
+  providerReference!: string | null;
+
   @CreateDateColumn({ type: "timestamptz" })
   createdAt!: Date;
 

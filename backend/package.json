@@ -34,6 +34,7 @@
     "test:inquiry-lifecycle": "npm run build && node --test test/payment-inquiry-lifecycle.test.cjs",
     "test:inquiry-decision": "npm run build && node --test test/payment-inquiry-decision.test.cjs",
     "test:inquiry-workflow": "npm run build && node --test test/payment-inquiry-workflow.test.cjs",
-    "test:inquiry-workflow-integration": "npm run build && node --test test/payment-inquiry-workflow.integration.test.cjs"
+    "test:inquiry-workflow-integration": "npm run build && node --test test/payment-inquiry-workflow.integration.test.cjs",
+    "test:payment-idempotency-integration": "npm run build && node --test test/payment-idempotency.integration.test.cjs"
   }
 }
